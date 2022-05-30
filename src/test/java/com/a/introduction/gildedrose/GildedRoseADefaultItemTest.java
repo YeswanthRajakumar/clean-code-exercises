@@ -9,7 +9,7 @@ public class GildedRoseADefaultItemTest {
     public static final String DEFAULT_ITEM = "DEFAULT_ITEM";
 
     @Test
-    public void testUpdateQualityOneNonExpiredDefaultItem() {
+    public void testUpdateQualityForOneNonExpiredDefaultItemWhereQualityDecreasesByOne() {
         GildedRose app = getGildedRoseWithOneItem(15, 3);
         app.updateQuality();
         Item expectedItem = getItem(14, 2);
@@ -18,7 +18,7 @@ public class GildedRoseADefaultItemTest {
     }
 
     @Test
-    public void testUpdateQualityForOneExpiredDefaultItem() {
+    public void testUpdateQualityForOneExpiredDefaultItemWhereQualityDecreasesByTwo() {
         GildedRose app = getGildedRoseWithOneItem(-1, 4);
         app.updateQuality();
         Item expectedItem = getItem(-2, 2);
