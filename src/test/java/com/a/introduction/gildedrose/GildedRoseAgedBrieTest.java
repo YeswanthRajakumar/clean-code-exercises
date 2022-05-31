@@ -5,7 +5,7 @@ import static com.a.introduction.gildedrose.GildedRoseTestUtilities.*;
 
 import org.junit.jupiter.api.Test;
 
-public class GildedRoseBAgedBrieTest {
+public class GildedRoseAgedBrieTest {
 
     public static final int NON_EXPIRED_SELLIN = 4;
     public static final int NON_EXPIRED_QUALITY = 3;

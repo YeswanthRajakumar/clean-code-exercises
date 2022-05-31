@@ -1,45 +1,49 @@
 package com.a.introduction.gildedrose;
 
+import static com.a.introduction.gildedrose.GildedRoseTestUtilities.assertItem;
+import static com.a.introduction.gildedrose.GildedRoseTestUtilities.getGildedRoseWithOneItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
 public class GildedRoseCBackstagePassesTest {
-	
-	@Test
-	public void testUpdateQualityBackstagePasses1() {
-		Item item = new Item("Backstage passes to a TAFKAL80ETC concert", 15, 3);
-		Item[] items = new Item[] { item };
-		GildedRose app = new GildedRose(items);
-		app.updateQuality();
-		assertEquals("Backstage passes to a TAFKAL80ETC concert",
-				app.items[0].name);
-		assertEquals(14, app.items[0].sellIn);
-		assertEquals(4, app.items[0].quality);
-	}
+    public static final int SELLIN_GREATER_THAN_10 = 15;
+    public static final int QUALITY = 3;
+    public static final int SELLIN_LESS_THAN_10 = 7;
+    private static final int SELLIN_LESS_THAN_5 = 4;
 
-	@Test
-	public void testUpdateQualityBackstagePasses2() {
-		Item item = new Item("Backstage passes to a TAFKAL80ETC concert", 7, 3);
-		Item[] items = new Item[] { item };
-		GildedRose app = new GildedRose(items);
-		app.updateQuality();
-		assertEquals("Backstage passes to a TAFKAL80ETC concert",
-				app.items[0].name);
-		assertEquals(6, app.items[0].sellIn);
-		assertEquals(5, app.items[0].quality);
-	}
+    @Test
+    public void testUpdateQualityBackstagePassesWhenSellinIsGreaterThanTen() {
+        GildedRose app = getGildedRoseWithOneItem("Backstage passes to a TAFKAL80ETC concert", SELLIN_GREATER_THAN_10, QUALITY);
+        app.updateQuality();
 
-	@Test
-	public void testUpdateQualityBackstagePasses3() {
-		Item item = new Item("Backstage passes to a TAFKAL80ETC concert", 4, 3);
-		Item[] items = new Item[] { item };
-		GildedRose app = new GildedRose(items);
-		app.updateQuality();
-		assertEquals("Backstage passes to a TAFKAL80ETC concert",
-				app.items[0].name);
-		assertEquals(3, app.items[0].sellIn);
-		assertEquals(6, app.items[0].quality);
-	}
+        Item actualItem = app.items[0];
+        Item expectedItem = new Item("Backstage passes to a TAFKAL80ETC concert", SELLIN_GREATER_THAN_10 - 1, QUALITY + 1);
+
+        assertItem(expectedItem, actualItem);
+    }
+
+    @Test
+    public void testUpdateQualityBackstagePassesWhenSellinIsLessThanTen() {
+        GildedRose app = getGildedRoseWithOneItem("Backstage passes to a TAFKAL80ETC concert", SELLIN_LESS_THAN_10, QUALITY);
+        app.updateQuality();
+
+        Item actualItem = app.items[0];
+        Item expectedItem = new Item("Backstage passes to a TAFKAL80ETC concert", SELLIN_LESS_THAN_10 - 1, QUALITY + 2);
+
+        assertItem(expectedItem, actualItem);
+
+    }
+
+    @Test
+    public void testUpdateQualityBackstagePassesWhenSellinIsLessThanFive() {
+        GildedRose app = getGildedRoseWithOneItem("Backstage passes to a TAFKAL80ETC concert", SELLIN_LESS_THAN_5, QUALITY);
+        app.updateQuality();
+
+        Item actualItem = app.items[0];
+        Item expectedItem = new Item("Backstage passes to a TAFKAL80ETC concert", SELLIN_LESS_THAN_5 - 1, QUALITY + 3);
+
+        assertItem(expectedItem, actualItem);
+    }
 
 }
