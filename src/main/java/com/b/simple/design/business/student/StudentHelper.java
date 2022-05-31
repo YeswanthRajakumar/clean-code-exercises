@@ -3,71 +3,63 @@ package com.b.simple.design.business.student;
 public class StudentHelper {
 
     public static final int LOWER_LIMIT_FOR_GRADE_B = 51;
-    public static final int UPPER_LIMIT_FOR_GRADE_B = 80;
     public static final int EXTRA_LIMIT_FOR_MATHS = 10;
+    public static final String GRADE_C = "C";
+    public static final String GRADE_A = "A";
+    public static final String GRADE_B = "B";
+    public static final int LOWER_LIMIT_FOR_GRADE_A = 90;
+    public static final int EXTRA_MARKS_SHOULD_BE_SCORED_FOR_MATHS = 5;
+    public static final String NOT_ELIGIBLE = "NO";
+    public static final String ELIGIBLE = "YES";
+    public static final String MAYBE_ELIGIBLE = "MAYBE";
+    public static final int MINIMUM_ELIGIBLE_MARK_FOR_QUIZ = 20;
+    public static final int MAXIMUM_ELIGIBILITY_MARK_FOR_QUIZ = 80;
+    public static final int UPPER_LIMIT_FOR_GRADE_B = MAXIMUM_ELIGIBILITY_MARK_FOR_QUIZ;
 
     public boolean isGradeB(int marks, boolean isMaths) {
-        int extraLimit = isMaths ? EXTRA_LIMIT_FOR_MATHS : 0;
-        int upperLimit = UPPER_LIMIT_FOR_GRADE_B + extraLimit;
-        return marksIsInRangeOfUpperAndLowerLimits(marks, LOWER_LIMIT_FOR_GRADE_B, upperLimit);
+        int extraLimitForMaths = isMaths ? EXTRA_LIMIT_FOR_MATHS : 0;
+        int upperLimit = UPPER_LIMIT_FOR_GRADE_B + extraLimitForMaths;
+        return (marks >= LOWER_LIMIT_FOR_GRADE_B) && (marks <= upperLimit);
     }
 
-    private boolean marksIsInRangeOfUpperAndLowerLimits(int marks, int lowerLimit, int upperLimit) {
-        return (marks >= lowerLimit) && (marks <= upperLimit);
-    }
-
-    /* PROBLEM 2 */
-	/*
-	You are awarded a grade based on your marks.
-	Grade A = 91 to 100, Grade B = 51 to 90, Otherwise Grade C
-	Except for Maths where marks to get a Grade are 5 higher than required for other subjects.
-	*/
 
     public String getGrade(int mark, boolean isMaths) {
-        String grade = "C";
-
-        if (isGradeA(mark, isMaths))
-            grade = "A";
-        else if (isBGrade(mark, isMaths)) {
-            grade = "B";
-        }
-        return grade;
+        if (isAGrade(mark, isMaths)) return GRADE_A;
+        if (isBGrade(mark, isMaths)) return GRADE_B;
+        return GRADE_C;
     }
 
-    private boolean isGradeA(int mark, boolean isMaths) {
-        int lowerLimitForAGrade = isMaths ? 95
-                : 90;
-        return mark > lowerLimitForAGrade;
+    private boolean isAGrade(int mark, boolean isMaths) {
+        int extra_limit_for_maths = isMaths ? EXTRA_MARKS_SHOULD_BE_SCORED_FOR_MATHS : 0;
+        int lowerLimitForAGrade = LOWER_LIMIT_FOR_GRADE_A + extra_limit_for_maths;
+        return markIsGreaterOrEqualToLowerLimit(mark, lowerLimitForAGrade);
+    }
+
+    private boolean markIsGreaterOrEqualToLowerLimit(int mark, int lowerLimitForAGrade) {
+        return mark >= lowerLimitForAGrade;
     }
 
     private boolean isBGrade(int mark, boolean isMaths) {
-        int lowerLimitGradeB = isMaths ? 55
-                : 50;
-        return mark > lowerLimitGradeB && mark < 90;
+        int extra_limit_for_math = isMaths ? EXTRA_MARKS_SHOULD_BE_SCORED_FOR_MATHS : 0;
+        int lowerLimitForBGrade = LOWER_LIMIT_FOR_GRADE_B + extra_limit_for_math;
+        return markIsGreaterOrEqualToLowerLimit(mark, lowerLimitForBGrade) && mark < LOWER_LIMIT_FOR_GRADE_A;
     }
 
-    /*  PROBLEM 3
-     * You and your Friend are planning to enter a Subject Quiz.
-     * However, there is a marks requirement that you should attain to qualify.
-     *
-     * Return value can be YES, NO or MAYBE.
-     *
-     * YES If either of you are very good at the subject(has 80 or more marks)
-     * However, there is an exception that if either of you is not good in the subject(20 or less marks), it is NO.
-     * In all other conditions, return MAYBE.
-     *
-     * However, the definition for good and not good are 5 marks higher if the subject is Mathematics.
-     *
-     * marks1 - your marks
-     * marks2 - your friends marks
-     */
 
-    public String willQualifyForQuiz(int marks1, int marks2, boolean isMaths) {
-        if ((isMaths ? marks1 <= 25 : marks1 <= 20)
-                || (isMaths ? marks2 <= 25 : marks2 <= 20)) return "NO";
-        if ((isMaths ? marks1 >= 85 : marks1 >= 80)
-                || (isMaths ? marks2 >= 85 : marks2 >= 80)) return "YES";
-        return "MAYBE";
+    public String willQualifyForQuiz(int yourMark, int friendsMark, boolean isMaths) {
+        if (isNotEligible(yourMark, friendsMark, isMaths)) return NOT_ELIGIBLE;
+        if (isEligible(yourMark, friendsMark, isMaths)) return ELIGIBLE;
+        return MAYBE_ELIGIBLE;
+    }
+
+    private boolean isEligible(int yourMark, int friendsMark, boolean isMaths) {
+        int maximumEligibilityMark = isMaths ? MAXIMUM_ELIGIBILITY_MARK_FOR_QUIZ + EXTRA_MARKS_SHOULD_BE_SCORED_FOR_MATHS : MAXIMUM_ELIGIBILITY_MARK_FOR_QUIZ;
+        return yourMark >= maximumEligibilityMark || friendsMark >= maximumEligibilityMark;
+    }
+
+    private boolean isNotEligible(int yourMark, int friendsMark, boolean isMaths) {
+        int minimumEligibilityMark = isMaths ? MINIMUM_ELIGIBLE_MARK_FOR_QUIZ + EXTRA_MARKS_SHOULD_BE_SCORED_FOR_MATHS : MINIMUM_ELIGIBLE_MARK_FOR_QUIZ;
+        return yourMark <= minimumEligibilityMark || friendsMark <= minimumEligibilityMark;
     }
 
 }
