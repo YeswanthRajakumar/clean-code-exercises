@@ -1,41 +1,43 @@
 package com.a.introduction.gildedrose;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.a.introduction.gildedrose.GildedRoseTestUtilities.*;
 
 import org.junit.jupiter.api.Test;
 
 public class GildedRoseBAgedBrieTest {
 
-	@Test
-	public void testUpdateQualityAgedBrie1() {
-		Item item = new Item("Aged Brie", 4, 3);
-		Item[] items = new Item[] { item };
-		GildedRose app = new GildedRose(items);
-		app.updateQuality();
-		assertEquals("Aged Brie", app.items[0].name);
-		assertEquals(3, app.items[0].sellIn);
-		assertEquals(4, app.items[0].quality);
-	}
+    public static final int NON_EXPIRED_SELLIN = 4;
+    public static final int NON_EXPIRED_QUALITY = 3;
+    public static final int EXPIRED_SELLIN = -1;
+    public static final int MAX_QUALITY = 50;
 
-	@Test
-	public void testUpdateQualityAgedBrie2() {
-		Item item = new Item("Aged Brie", -1, 3);
-		Item[] items = new Item[] { item };
-		GildedRose app = new GildedRose(items);
-		app.updateQuality();
-		assertEquals("Aged Brie", app.items[0].name);
-		assertEquals(-2, app.items[0].sellIn);
-		assertEquals(5, app.items[0].quality);
-	}
+    @Test
+    public void testUpdateQualityForNonExpiredAgedBrieIncreaseQualityByOneWhenSellinDecreaseByOne() {
 
-	@Test
-	public void testUpdateQualityAgedBrie3() {
-		Item item = new Item("Aged Brie", 4, 50);
-		Item[] items = new Item[] { item };
-		GildedRose app = new GildedRose(items);
-		app.updateQuality();
-		assertEquals("Aged Brie", app.items[0].name);
-		assertEquals(3, app.items[0].sellIn);
-		assertEquals(50, app.items[0].quality);
-	}
+        GildedRose app = getGildedRoseWithOneItem("Aged Brie", NON_EXPIRED_SELLIN, NON_EXPIRED_QUALITY);
+        Item expectedItem = getItem("Aged Brie", NON_EXPIRED_SELLIN - 1, NON_EXPIRED_QUALITY + 1);
+        Item actualItem = app.items[0];
+        app.updateQuality();
+        assertItem(expectedItem, actualItem);
+    }
+
+    @Test
+    public void testUpdateQualityForExpiredAgedBrieIncreaseQualityByTwoWhenSellinDecreaseByOne() {
+        int quality = 3;
+        GildedRose app = getGildedRoseWithOneItem("Aged Brie", EXPIRED_SELLIN, quality);
+        Item expectedItem = getItem("Aged Brie", EXPIRED_SELLIN - 1, quality + 2);
+        Item actualItem = app.items[0];
+        app.updateQuality();
+        assertItem(expectedItem, actualItem);
+    }
+
+    @Test
+    public void testUpdateQualityForNonExpiredAgedBrieDoesNotIncreaseQualityWhenAtTheMaxQualityAndSellinDecreaseByOne() {
+        GildedRose app = getGildedRoseWithOneItem("Aged Brie", NON_EXPIRED_SELLIN, MAX_QUALITY);
+        Item expectedItem = getItem("Aged Brie", NON_EXPIRED_SELLIN - 1, MAX_QUALITY);
+        Item actualItem = app.items[0];
+        app.updateQuality();
+        assertItem(expectedItem, actualItem);
+    }
 }
