@@ -1,4 +1,3 @@
-
 ```java
 package com.b.simple.design.business.customer;
 
@@ -8,84 +7,78 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.b.simple.design.model.customer.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.b.simple.design.business.customer.CustomerBO;
-import com.b.simple.design.business.customer.CustomerBOImplRefactored;
 import com.b.simple.design.business.exception.DifferentCurrenciesException;
-import com.b.simple.design.model.customer.Amount;
-import com.b.simple.design.model.customer.AmountImpl;
-import com.b.simple.design.model.customer.Currency;
-import com.b.simple.design.model.customer.Product;
-import com.b.simple.design.model.customer.ProductImpl;
-import com.b.simple.design.model.customer.ProductType;
+import com.b.simple.design.model.customer.AmountI;
 
 public class CustomerBOTestRefactored {
 
-	private CustomerBO clientBO = new CustomerBOImplRefactored();
+    private CustomerBOI clientBO = new CustomerBOImplRefactored();
 
-	@Test
-	public void testCustomerProductSum_AllProductsSameCurrency()
-			throws DifferentCurrenciesException {
+    @Test
+    public void testCustomerProductSum_AllProductsSameCurrency()
+            throws DifferentCurrenciesException {
 
-		Amount[] amounts = {
-				new AmountImpl(new BigDecimal("5.0"), Currency.EURO),
-				new AmountImpl(new BigDecimal("6.0"), Currency.EURO) };
+        AmountI[] amounts = {
+                new Amount(new BigDecimal("5.0"), Currency.EURO),
+                new Amount(new BigDecimal("6.0"), Currency.EURO)};
 
-		Amount expected = new AmountImpl(new BigDecimal("11.0"), Currency.EURO);
-		
-		List<Product> products = createProductListWithAmounts(amounts);
+        AmountI expected = new Amount(new BigDecimal("11.0"), Currency.EURO);
 
-		Amount actual = clientBO.getCustomerProductsSum(products);
+        List<ProductI> products = createProductListWithAmounts(amounts);
 
-		assertAmount(actual, expected);
-	}
+        AmountI actual = clientBO.getSumOfProducts(products);
 
-	@Test
-	public void testCustomerProductSum_DifferentCurrencies_ThrowsException()
-			throws DifferentCurrenciesException {
+        assertAmount(actual, expected);
+    }
 
-		Amount[] amounts = {
-				new AmountImpl(new BigDecimal("5.0"), Currency.EURO),
-				new AmountImpl(new BigDecimal("6.0"), Currency.INDIAN_RUPEE) };
+    @Test
+    public void testCustomerProductSum_DifferentCurrencies_ThrowsException()
+            throws DifferentCurrenciesException {
 
-		List<Product> products = createProductListWithAmounts(amounts);
-		
-		Assertions.assertThrows(DifferentCurrenciesException.class, () -> {
-			@SuppressWarnings("unused")
-			Amount actual = clientBO.getCustomerProductsSum(products);
-		});
-	}
+        AmountI[] amounts = {
+                new Amount(new BigDecimal("5.0"), Currency.EURO),
+                new Amount(new BigDecimal("6.0"), Currency.INDIAN_RUPEE)};
 
-	@Test
-	public void testCustomerProductSum_NoProducts()
-			throws DifferentCurrenciesException {
+        List<ProductI> products = createProductListWithAmounts(amounts);
 
-		Amount[] amounts = {};
-		Amount expected = new AmountImpl(BigDecimal.ZERO, Currency.EURO);
+        Assertions.assertThrows(DifferentCurrenciesException.class, () -> {
+            @SuppressWarnings("unused")
+            AmountI actual = clientBO.getSumOfProducts(products);
+        });
+    }
 
-		List<Product> products = createProductListWithAmounts(amounts);
+    @Test
+    public void testCustomerProductSum_NoProducts()
+            throws DifferentCurrenciesException {
 
-		Amount actual = clientBO.getCustomerProductsSum(products);
+        AmountI[] amounts = {};
+        AmountI expected = new Amount(BigDecimal.ZERO, Currency.EURO);
+
+        List<ProductI> products = createProductListWithAmounts(amounts);
+
+        AmountI actual = clientBO.getSumOfProducts(products);
 
 
-		assertAmount(actual, expected);
-	}
+        assertAmount(actual, expected);
+    }
 
-	private void assertAmount(Amount actual, Amount expected) {
-		assertEquals(expected.getCurrency(), actual.getCurrency());
-		assertEquals(expected.getValue(), actual.getValue());
-	}
+    private void assertAmount(AmountI actual, AmountI expected) {
+        assertEquals(expected.getCurrency(), actual.getCurrency());
+        assertEquals(expected.getValue(), actual.getValue());
+    }
 
-	private List<Product> createProductListWithAmounts(Amount[] amounts) {
-		List<Product> products = new ArrayList<Product>();
-		for (Amount amount : amounts) {
-			products.add(new ProductImpl(100, "Product 15",
-					ProductType.BANK_GUARANTEE, amount));
-		}
-		return products;
-	}
+    private List<ProductI> createProductListWithAmounts(AmountI[] amounts) {
+        List<ProductI> products = new ArrayList<ProductI>();
+        for (AmountI amount : amounts) {
+            products.add(new Product(100, "Product 15",
+                    ProductType.BANK_GUARANTEE, amount));
+        }
+        return products;
+    }
 
 }
 ```

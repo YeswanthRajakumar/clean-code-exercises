@@ -16,12 +16,12 @@ public class CustomerImpl implements Customer {
 
 	private List<Collateral> collaterals;
 
-	private List<Product> products;
+	private List<ProductI> products;
 
 	private BigDecimal productAmount;
 
 	public CustomerImpl(long id, String name, CustomerType type,
-			List<Collateral> collaterals, List<Product> products) {
+			List<Collateral> collaterals, List<ProductI> products) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -66,11 +66,11 @@ public class CustomerImpl implements Customer {
 	}
 
 	@Override
-	public List<Product> getProducts() {
+	public List<ProductI> getProducts() {
 		return products;
 	}
 
-	public void setProducts(List<Product> products) {
+	public void setProducts(List<ProductI> products) {
 		this.products = products;
 	}
 

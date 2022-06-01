@@ -16,7 +16,7 @@ public interface Customer {
 
 	List<Collateral> getCollaterals();
 
-	List<Product> getProducts();
+	List<ProductI> getProducts();
 
 	void setProductAmount(BigDecimal productAmount);
 

@@ -14,54 +14,54 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CustomerBOTest {
 
     public static final Currency EURO = Currency.EURO;
-    private final CustomerBO customerBO = new CustomerBOImpl();
+    private final CustomerBOI customerBO = new CustomerBO();
 
     @Test
     public void testShouldAddTwoProductsSameCurrencies() throws DifferentCurrenciesException {
-        AmountImpl amount5_0 = getAmount("5.0");
-        AmountImpl amount6_0 = getAmount("6.0");
-        AmountImpl[] amounts = new AmountImpl[]{amount5_0, amount6_0};
-        ArrayList<Product> products = getProductsWithAmount(amounts);
+        Amount amount5_0 = getAmount("5.0");
+        Amount amount6_0 = getAmount("6.0");
+        Amount[] amounts = new Amount[]{amount5_0, amount6_0};
+        ArrayList<ProductI> products = getProductsWithAmount(amounts);
 
-        Amount actualAmount = customerBO.getCustomerProductsSum(products);
+        AmountI actualAmount = customerBO.getSumOfProducts(products);
 
         assertCurrency(new BigDecimal("11.0"), actualAmount);
     }
 
-    private void assertCurrency(BigDecimal expectedAmount, Amount actualAmount) {
+    private void assertCurrency(BigDecimal expectedAmount, AmountI actualAmount) {
         assertEquals(expectedAmount, actualAmount.getValue());
         assertEquals(EURO, actualAmount.getCurrency());
     }
 
-    private ArrayList<Product> getProductsWithAmount(AmountImpl[] amounts) {
-        ArrayList<Product> products = new ArrayList<Product>();
-        for (AmountImpl amount : amounts) {
+    private ArrayList<ProductI> getProductsWithAmount(Amount[] amounts) {
+        ArrayList<ProductI> products = new ArrayList<>();
+        for (Amount amount : amounts) {
             products.add(getProduct(amount));
         }
         return products;
     }
 
-    private ProductImpl getProduct(AmountImpl amount) {
-        return new ProductImpl(100, "Product 15", ProductType.BANK_GUARANTEE, amount);
+    private Product getProduct(Amount amount) {
+        return new Product(100, "Product 15", ProductType.BANK_GUARANTEE, amount);
     }
 
-    private AmountImpl getAmount(String value) {
-        return new AmountImpl(new BigDecimal(value), CustomerBOTest.EURO);
+    private Amount getAmount(String value) {
+        return new Amount(new BigDecimal(value), CustomerBOTest.EURO);
     }
 
     @Test
     public void testShouldThrowException_whenDifferentCurrenciesGotAdded() {
-        AmountImpl amount5_0 = new AmountImpl(new BigDecimal("5.0"), Currency.INDIAN_RUPEE);
-        AmountImpl amount6_0 = new AmountImpl(new BigDecimal("6.0"), Currency.EURO);
-        AmountImpl[] amounts = new AmountImpl[]{amount5_0, amount6_0};
-        ArrayList<Product> products = getProductsWithAmount(amounts);
-        Assertions.assertThrows(DifferentCurrenciesException.class, () -> customerBO.getCustomerProductsSum(products));
+        Amount amount5_0 = new Amount(new BigDecimal("5.0"), Currency.INDIAN_RUPEE);
+        Amount amount6_0 = new Amount(new BigDecimal("6.0"), Currency.EURO);
+        Amount[] amounts = new Amount[]{amount5_0, amount6_0};
+        ArrayList<ProductI> products = getProductsWithAmount(amounts);
+        Assertions.assertThrows(DifferentCurrenciesException.class, () -> customerBO.getSumOfProducts(products));
     }
 
     @Test
     public void testShouldReturnZeroWhenProductsListIsZero() throws DifferentCurrenciesException {
-        List<Product> products = new ArrayList<Product>();
-        Amount temp = customerBO.getCustomerProductsSum(products);
+        List<ProductI> products = new ArrayList<>();
+        AmountI temp = customerBO.getSumOfProducts(products);
         assertEquals(EURO, temp.getCurrency());
         assertEquals(BigDecimal.ZERO, temp.getValue());
     }

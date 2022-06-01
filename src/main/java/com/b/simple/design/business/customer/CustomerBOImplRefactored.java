@@ -4,19 +4,19 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.b.simple.design.business.exception.DifferentCurrenciesException;
+import com.b.simple.design.model.customer.AmountI;
 import com.b.simple.design.model.customer.Amount;
-import com.b.simple.design.model.customer.AmountImpl;
 import com.b.simple.design.model.customer.Currency;
-import com.b.simple.design.model.customer.Product;
+import com.b.simple.design.model.customer.ProductI;
 
-public class CustomerBOImplRefactored implements CustomerBO {
+public class CustomerBOImplRefactored implements CustomerBOI {
 
 	@Override
-	public Amount getCustomerProductsSum(List<Product> products)
+	public AmountI getSumOfProducts(List<ProductI> products)
 			throws DifferentCurrenciesException {
 
 		if (products.size() == 0)
-			return new AmountImpl(BigDecimal.ZERO, Currency.EURO);
+			return new Amount(BigDecimal.ZERO, Currency.EURO);
 
 		if(!doAllProductsHaveSameCurrency(products)) {
 			throw new DifferentCurrenciesException();
@@ -25,7 +25,7 @@ public class CustomerBOImplRefactored implements CustomerBO {
 		return calculateSumOfProducts(products);
 	}
 
-	private Amount calculateSumOfProducts(List<Product> products) {
+	private AmountI calculateSumOfProducts(List<ProductI> products) {
 		
 		Currency firstProductCurrency = products.get(0).getAmount()
 				.getCurrency();
@@ -34,10 +34,10 @@ public class CustomerBOImplRefactored implements CustomerBO {
 			.map(product -> product.getAmount().getValue())
 			.reduce(BigDecimal.ZERO, BigDecimal::add);
 
-		return new AmountImpl(sum, firstProductCurrency);
+		return new Amount(sum, firstProductCurrency);
 	}
 
-	private boolean doAllProductsHaveSameCurrency(List<Product> products) throws DifferentCurrenciesException {
+	private boolean doAllProductsHaveSameCurrency(List<ProductI> products) throws DifferentCurrenciesException {
 
 		Currency firstProductCurrency = products.get(0).getAmount()
 				.getCurrency();
