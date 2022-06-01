@@ -18,7 +18,6 @@ public class CustomerBOTest {
 
     @Test
     public void testShouldAddTwoProductsSameCurrencies() throws DifferentCurrenciesException {
-
         AmountImpl amount5_0 = getAmount("5.0");
         AmountImpl amount6_0 = getAmount("6.0");
         AmountImpl[] amounts = new AmountImpl[]{amount5_0, amount6_0};
@@ -26,8 +25,12 @@ public class CustomerBOTest {
 
         Amount actualAmount = customerBO.getCustomerProductsSum(products);
 
+        assertCurrency(new BigDecimal("11.0"), actualAmount);
+    }
+
+    private void assertCurrency(BigDecimal expectedAmount, Amount actualAmount) {
+        assertEquals(expectedAmount, actualAmount.getValue());
         assertEquals(EURO, actualAmount.getCurrency());
-        assertEquals(new BigDecimal("11.0"), actualAmount.getValue());
     }
 
     private ArrayList<Product> getProductsWithAmount(AmountImpl[] amounts) {
