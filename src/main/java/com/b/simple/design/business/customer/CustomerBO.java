@@ -13,23 +13,30 @@ public class CustomerBO implements CustomerBOI {
 
     @Override
     public AmountI getSumOfProducts(List<ProductI> products) throws DifferentCurrenciesException {
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        if (products.isEmpty()) return new Amount(totalAmount, Currency.EURO);
-
-        ProductI firstProduct = products.get(0);
-        Currency CurrencyTypeOfFirstProduct = getCurrencyTypeOfProduct(firstProduct);
-
-        for (ProductI product : products) {
-            if (!getCurrencyTypeOfProduct(product).equals(CurrencyTypeOfFirstProduct))
-                throw new DifferentCurrenciesException();
-            totalAmount = totalAmount.add(product.getAmount().getValue());
-        }
-
-        return new Amount(totalAmount, CurrencyTypeOfFirstProduct);
+        if (products.isEmpty())
+            return new Amount(BigDecimal.ZERO, Currency.EURO);
+        if (!isSameTypeOfCurrency(products))
+            throw new DifferentCurrenciesException();
+        return calculateSumOfProducts(products);
     }
 
-    private Currency getCurrencyTypeOfProduct(ProductI products) {
-        return products.getAmount().getCurrency();
+    private Amount calculateSumOfProducts(List<ProductI> products) {
+        Currency currencyTypeOfFirstProduct = getCurrencyTypeOfProduct(products.get(0));
+        BigDecimal sumOfProducts = products.stream()
+                .map(product -> product.getAmount().getValue())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return new Amount(sumOfProducts, currencyTypeOfFirstProduct);
+    }
+
+    private boolean isSameTypeOfCurrency(List<ProductI> products) {
+        Currency currencyTypeOfFirstProduct = getCurrencyTypeOfProduct(products.get(0));
+        return products.stream()
+                .map(product -> product.getAmount().getCurrency())
+                .allMatch(currencyType -> currencyType.equals(currencyTypeOfFirstProduct));
+    }
+
+    private Currency getCurrencyTypeOfProduct(ProductI product) {
+        return product.getAmount().getCurrency();
     }
 
 }
