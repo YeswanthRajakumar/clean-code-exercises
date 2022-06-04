@@ -9,18 +9,18 @@ public class UserLoginChecker {
 
     private static final int MAXIMUM_LOCK_PERIOD_IN_MILLISECONDS = 3600000;
 
-    public Lock isUserAllowedToLogin(boolean isFirstScreen, User userTryingToLogin, List existingLocks) {
+    public Lock isUserAllowedToLogin(boolean isFirstScreen, User userTryingToLogin, List<Object> existingLocks) {
 
         if (existingLocks.isEmpty()) return new Lock();
 
         Object[] existingLock = (Object[]) existingLocks.get(0);
         String userIdWithLock = getUserId(existingLock);
-        String lockMsg = getLockMsg(userIdWithLock);
 
-        if (isTimeToLockExpired(existingLock))
-            return userInFirstScreenOrUserHasAccess(isFirstScreen, userTryingToLogin, userIdWithLock) ? getWriteLock() : getReadLock(lockMsg);
+        if (isSameUserTryingToLoginAgain(userTryingToLogin, userIdWithLock)) return getWriteLock();
 
-        return isSameUserTryingToLoginAgain(userTryingToLogin, userIdWithLock) ? getWriteLock() : getReadLock(lockMsg);
+        if (isTimeToLockIsExpired(existingLock) && isFirstScreen) return getWriteLock();
+
+        return getReadLockWithLockMessage(userIdWithLock);
 
     }
 
@@ -34,18 +34,16 @@ public class UserLoginChecker {
         return lock;
     }
 
-    private Lock getReadLock(String lockMsg) {
+    private Lock getReadLockWithLockMessage(String userIdWithLock) {
         Lock lock = new Lock();
         lock.setRead(true);
+        String lockMsg = getLockMsg(userIdWithLock);
         lock.setLockReason(lockMsg);
         return lock;
     }
 
-    private boolean userInFirstScreenOrUserHasAccess(boolean firstScreen, User user, String userId) {
-        return firstScreen || isSameUserTryingToLoginAgain(user, userId);
-    }
 
-    private boolean isTimeToLockExpired(Object[] existingLock) {
+    private boolean isTimeToLockIsExpired(Object[] existingLock) {
         return getGetCurrentTime() - getLockTimestamp(existingLock) > MAXIMUM_LOCK_PERIOD_IN_MILLISECONDS;
     }
 
