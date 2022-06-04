@@ -12,15 +12,15 @@ public class MenuItem {
     boolean visible;
     String writeAccessRole;
 
-    public MenuItem(String name ,
-            boolean visible , List<MenuItem> childMenus) {
+    public MenuItem(String name,
+                    boolean visible, List<MenuItem> childMenus) {
         super();
         this.name = name;
         this.visible = visible;
         this.childMenus = childMenus;
     }
 
-    public MenuItem(String name , String readAccessRole , String writeAccessRole) {
+    public MenuItem(String name, String readAccessRole, String writeAccessRole) {
         super();
         this.name = name;
         this.readAccessRole = readAccessRole;
@@ -31,48 +31,24 @@ public class MenuItem {
         return access;
     }
 
-    public List<MenuItem> getChildMenus() {
-        return childMenus;
+    public void setAccess(String access) {
+        this.access = access;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getReadAccessRole() {
-        return readAccessRole;
-    }
-
-    public String getWriteAccessRole() {
-        return writeAccessRole;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean isVisible() {
         return visible;
     }
 
-    public void setAccess(String access) {
-        this.access = access;
-    }
-
-    public void setChildMenus(List<MenuItem> childMenus) {
-        this.childMenus = childMenus;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setReadAccessRole(String readAccessRole) {
-        this.readAccessRole = readAccessRole;
-    }
-
     public void setVisible(boolean visible) {
         this.visible = visible;
-    }
-
-    public void setWriteAccessRole(String writeAccessRole) {
-        this.writeAccessRole = writeAccessRole;
     }
 
     @Override

@@ -3,51 +3,66 @@ package com.c.refactoring.lock;
 import java.util.Date;
 import java.util.List;
 
+import static com.c.refactoring.lock.Constants.LOCK_TEXT;
+
 public class UserLoginChecker {
 
-    /**
-     * {@inheritDoc}.
-     */
-    public Lock isUserAllowedToLogin(long id, String status,
-            boolean firstScreen, User user, List list) {
+    private static final int MAXIMUM_LOCK_PERIOD_IN_MILLISECONDS = 3600000;
+
+    public Lock isUserAllowedToLogin(boolean isFirstScreen, User userTryingToLogin, List existingLocks) {
+
+        if (existingLocks.isEmpty()) return new Lock();
+
+        Object[] existingLock = (Object[]) existingLocks.get(0);
+        String userIdWithLock = getUserId(existingLock);
+        String lockMsg = getLockMsg(userIdWithLock);
+
+        if (isTimeToLockExpired(existingLock))
+            return userInFirstScreenOrUserHasAccess(isFirstScreen, userTryingToLogin, userIdWithLock) ? getWriteLock() : getReadLock(lockMsg);
+
+        return isSameUserTryingToLoginAgain(userTryingToLogin, userIdWithLock) ? getWriteLock() : getReadLock(lockMsg);
+
+    }
+
+    private boolean isSameUserTryingToLoginAgain(User userTryingToLogin, String userIdWithLock) {
+        return userIdWithLock.equalsIgnoreCase(userTryingToLogin.getUserId());
+    }
+
+    private Lock getWriteLock() {
+        Lock lock = new Lock();
+        lock.setRead(false);
+        return lock;
+    }
+
+    private Lock getReadLock(String lockMsg) {
+        Lock lock = new Lock();
+        lock.setRead(true);
+        lock.setLockReason(lockMsg);
+        return lock;
+    }
+
+    private boolean userInFirstScreenOrUserHasAccess(boolean firstScreen, User user, String userId) {
+        return firstScreen || isSameUserTryingToLoginAgain(user, userId);
+    }
+
+    private boolean isTimeToLockExpired(Object[] existingLock) {
+        return getGetCurrentTime() - getLockTimestamp(existingLock) > MAXIMUM_LOCK_PERIOD_IN_MILLISECONDS;
+    }
+
+    private long getGetCurrentTime() {
         Date time = new Date();
-        Lock lck = new Lock();
-        if (list.size() > 0 && list.get(0) != null) {
-            Object[] object = (Object[]) list.get(0);
-            String userId = (String) object[0];
-            Date lockTimestamp = (Date) object[1];
-            if (userId != null) {
-                // message which is shown to the user 
-                String lockMsg = Constants.LOCK_TEXT.replaceAll("@@USER@@",
-                        userId);
-                //if userID is present, the Lock time stamp will also be present
-                //4800000 milliseconds equals to 1 1/2 hours.
-                if (time.getTime() - lockTimestamp.getTime() > 3600000) {
-                    //New user gets lock only on first screen 
-                    //If 1 1/2 hours expires when user is not on 1st screen then for same user lock can be refreshed.
-                    if (firstScreen
-                            || userId.equalsIgnoreCase(user.getUserId())) {
-                        //to set the  access to write mode
-                        lck.setRead(false);
-                        return lck;
-                    }
-                    lck.setRead(true);
-                    //Only read access is permitted to other user
-                    lck.setLockReason(lockMsg);
-                    return lck;
-                } else if (userId.equalsIgnoreCase(user.getUserId())) {
-                    // Locked By Same User, Write access
-                    lck.setRead(false);
-                    return lck;
-                } else {
-                    lck.setRead(true);
-                    //Only Read Access is Permitted
-                    lck.setLockReason(lockMsg);
-                    return lck;
-                }
-            }
-        }
-        lck.setRead(false);
-        return lck;
+        return time.getTime();
+    }
+
+    private String getLockMsg(String userId) {
+        return LOCK_TEXT.replace("@@USER@@", userId);
+    }
+
+    private long getLockTimestamp(Object[] access) {
+        return ((Date) access[1]).getTime();
+    }
+
+    private String getUserId(Object[] access) {
+        return (String) access[0];
     }
 }
